@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import sudoku.sudokuGrid;
 
 public class login extends JFrame {
     public JLabel titleLabel,titleLabel2;
@@ -21,7 +22,8 @@ public class login extends JFrame {
     public JTextField usernameField;
     public JTextField emailField;
     public JPasswordField passwordField;
-    public JButton signupButton;
+    public JButton loginButton;
+    private static String username;
 
     public login() {
         setTitle("SUDOKU");
@@ -66,14 +68,14 @@ public class login extends JFrame {
         gotoSignup.setHorizontalAlignment(SwingConstants.RIGHT);
         panel.add(gotoSignup);
         
-        signupButton = new JButton("LOGIN");
-        signupButton.setFont(new Font("Arial", Font.BOLD, 20));
-        signupButton.setBackground(Color.BLUE);
-        signupButton.setBorderPainted(false);
-        signupButton.setForeground(Color.WHITE);
+        loginButton = new JButton("LOGIN");
+        loginButton.setFont(new Font("Arial", Font.BOLD, 20));
+        loginButton.setBackground(Color.BLUE);
+        loginButton.setBorderPainted(false);
+        loginButton.setForeground(Color.WHITE);
         
-        signupButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        panel.add(signupButton);
+        loginButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        panel.add(loginButton);
         
         validErr = new JLabel("");
         validErr.setForeground(Color.RED);
@@ -89,36 +91,54 @@ public class login extends JFrame {
         Dimension fieldSize = new Dimension(panel.getWidth() - 40, 30);
         usernameField.setPreferredSize(fieldSize);
         passwordField.setPreferredSize(fieldSize);
-        signUpClick();
+        loginClick();
         gotoSignup();
     }
-    void signUpClick() {
-    	signupButton.addActionListener(new ActionListener() {
+    void loginClick() {
+    	loginButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String username = usernameField.getText();
 				String password=new String(passwordField.getPassword());
-				String regex="^[a-zA-Z0-9]+$";
 				//Validation
-				if(username.isEmpty() || password.isEmpty()) {
-					validErr.setText("Fill all the requirements.");
-				}
-				else if(!username.matches(regex)){
-					validErr.setText("Username doesn't support any symbolic character.");
-				}
-				else if(username.length()<8 || password.length()<8) {
-					validErr.setText("Character must be atleast 8 characters.");
-				}
-				else {
+				if(isValidLogin(username,password)) {
+//					login.username=username;
 					loginUser(username,password);
-					
 				}
 			}
     		
     	});
     }
-    void gotoSignup() {
+    public boolean isValidLogin(String username,String password) {
+
+		String user = usernameField.getText();
+		String pass=new String(passwordField.getPassword());
+		String regex="^[a-zA-Z0-9]+$";
+    	//Validation
+		if(username.isEmpty() || password.isEmpty()) {
+			validErr.setText("Fill all the requirements.");
+			return false;
+		}
+		else if(!username.matches(regex)){
+			validErr.setText("Username doesn't support any symbolic character.");
+			return false;
+		}
+		else if(username.length()<8 || password.length()<8) {
+			validErr.setText("Character must be atleast 8 characters.");
+			return false;
+		}
+		else {
+			
+			return true;
+		}
+    }
+    public void openSudokuFrame() {
+    	sudokuGrid game = new sudokuGrid();
+    	game.sudokuGrid();
+    	dispose();
+    }
+	void gotoSignup() {
     	gotoSignup.addMouseListener(new MouseAdapter() {
 
 			public void mouseClicked(MouseEvent e) {
@@ -134,18 +154,17 @@ public class login extends JFrame {
     	try {
         	Connection connection = connect.getConnection();
         	Statement statement = connection.createStatement();
-        	String query = "SELECT * FROM user WHERE username='"+username+"' and password='"+password+"'";
+        	String query = "SELECT * FROM users WHERE username='"+username+"' and password='"+password+"'";
         	ResultSet resultSet = statement.executeQuery(query);
         		if(resultSet.next()) {
-        			validErr.setText("Found");
+        			login.username=username;
+        			fetchSession.setSessionData(username);
+        			openSudokuFrame();
         		}	
         		else {
-//            				statement.executeUpdate("INSERT INTO user(username,password) VALUES('"+username+"','"+password+"')");
-//            		    	login login = new login();
-//            		    	login.setVisible(true);
-//            		    	dispose();
+//            				
         			validErr.setText("Not Found");
-        			}
+        		}
         		
     	}
     	catch(SQLException e) {
@@ -160,7 +179,7 @@ public class login extends JFrame {
                 e.printStackTrace();
             }
 
-            login signupForm = new login();
-            signupForm.setVisible(true);
+            login loginForm = new login();
+            loginForm.setVisible(true);
     }
 }

@@ -154,35 +154,32 @@ public class signup extends JFrame {
     	try {
         	Connection connection = connect.getConnection();
         	Statement statement = connection.createStatement();
-        	String query = "SELECT * FROM user WHERE username='"+username+"'";
+        	String query = "SELECT * FROM users WHERE username='"+username+"'";
         	ResultSet resultSet = statement.executeQuery(query);
-        		if(resultSet.next()) {
-        			validErr.setText("Username already exists");
-
-					isValid=false;
-        		}	
-        		else {
-            				statement.executeUpdate("INSERT INTO user(username,password) VALUES('"+username+"','"+password+"')");
-            		    	login login = new login();
-            		    	login.setVisible(true);
-            		    	dispose();
-        			}
-        		
+    		if(resultSet.next()) {
+    			validErr.setText("Username already exists");
+				isValid=false;
+    		}	
+    		else {
+				statement.executeUpdate("INSERT INTO users(username,password) VALUES('"+username+"','"+password+"')");
+		    	login login = new login();
+		    	login.setVisible(true);
+		    	dispose();
+    		}	
     	}
     	catch(SQLException e) {
     		e.printStackTrace();
     	}
-
     }
 
     public static void main(String[] args) {
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-            signup signupForm = new signup();
-            signupForm.setVisible(true);
+        signup signupForm = new signup();
+        signupForm.setVisible(true);
     }
 }

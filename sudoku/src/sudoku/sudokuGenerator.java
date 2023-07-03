@@ -5,6 +5,7 @@ import java.util.Random;
 public class sudokuGenerator {
     public int[][] grid;
     public Random random;
+    public static int[][] data;
 
     public sudokuGenerator() {
         grid = new int[9][9];
@@ -20,6 +21,7 @@ public class sudokuGenerator {
     public void solve() {
         if (solveSudoku(0, 0)) {
             System.out.println("Sudoku Solution:");
+            data=grid;
             printGrid();
         } else {
             System.out.println("No solution exists for the given Sudoku grid.");
