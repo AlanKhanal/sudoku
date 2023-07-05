@@ -21,7 +21,11 @@ import javax.swing.border.Border;
 
 class myFrame extends JFrame implements KeyListener{
 	public String gameID="";
-
+	JLabel timeLabel;
+	Timer timer ;
+	long startTime;
+	long elapsedTime,minutes,seconds,milliseconds;
+	String time;
 	int easyZero=0,easyOnes=0,medZero=0,medOnes=0,hardZero=0,hardOnes=0;
 	int point=0;
 	int totHint=0;
@@ -94,7 +98,7 @@ class myFrame extends JFrame implements KeyListener{
 		east.setPreferredSize(new Dimension(450,450));
 		c.add(east,BorderLayout.EAST);
 		
-		GridLayout gridLayout = new GridLayout(3, 1); // 3 rows, 1 column
+		GridLayout gridLayout = new GridLayout(4, 1); // 3 rows, 1 column
 	    east.setLayout(gridLayout);
 		
 	    timer();
@@ -105,7 +109,33 @@ class myFrame extends JFrame implements KeyListener{
 		//about();
 	}
 	void timer() {
+		timeLabel = new JLabel("00:00:000");
+		timeLabel.setFont(new Font("Arial",Font.BOLD,24));
+		timeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		startTime = System.currentTimeMillis();
 		
+		timer = new Timer(10,e->{
+			
+			elapsedTime=System.currentTimeMillis()-startTime;
+			minutes = (elapsedTime/60000)%60;
+			seconds = (elapsedTime/1000)%60;
+			milliseconds=elapsedTime%1000;
+			time = String.format("%02d:%02d:%03d", minutes, seconds, milliseconds);
+			timeLabel.setText(time);
+		});
+		
+		timer.start();
+		east.add(timeLabel);
+		setVisible(true);
+	}
+	void stopTimer() {
+		timer.stop();
+		elapsedTime = System.currentTimeMillis()-startTime;
+		minutes = (elapsedTime / 60000) % 60;
+        seconds = (elapsedTime / 1000) % 60;
+        milliseconds = elapsedTime % 1000;
+        time = String.format("%02d:%02d:%03d", minutes, seconds, milliseconds);
+        timeLabel.setText(time);
 	}
 	void newgame() {
 		JButton newgame = new JButton("New Game");
@@ -135,6 +165,8 @@ class myFrame extends JFrame implements KeyListener{
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 			
 			if (choice == JOptionPane.YES_OPTION) {
+
+				stopTimer();
 				sudokuGenerator generator = new sudokuGenerator();
 				int[][] solvedSudoku = generator.data;
 				for(int row=0;row<9;row++) {
@@ -440,8 +472,11 @@ class myFrame extends JFrame implements KeyListener{
 			}
 		}
 		if(solved) {
-			updateRecord();
 			
+			stopTimer();
+			updateRecord();
+			hint.setEnabled(false);
+			surrender.setEnabled(false);			
 			//execution
 			for(int row=0;row<9;row++) {
 				for(int col=0;col<9;col++) {
