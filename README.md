@@ -30,15 +30,11 @@ _Features done:_
   
   g. Confirmation pop up for important game events
 
-_Features to be updated:_
+  h. Stop Watch
 
-  a. Logout
-  
-  b. Password Hashing
-  
-  c. UI
-  
-  d. [Many more, may be] {T_T}
+  i. High Score visible if game win.
+
+  j. Win and Loss status after each game is finished.
 
 **The code is not properly managed.** 
 
