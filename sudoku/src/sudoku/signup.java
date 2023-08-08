@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,6 +31,8 @@ public class signup extends JFrame {
     public signup() {
         setTitle("SUDOKU");
         setSize(650, 550);
+        Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Users\\ASUS\\eclipse-workspace\\sudoku\\src\\sudoku\\icon\\newgame.png");    
+        setIconImage(icon);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(true);
 
@@ -107,7 +111,6 @@ public class signup extends JFrame {
     }
     void signUpClick() {
     	signupButton.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String username = usernameField.getText();
@@ -132,7 +135,18 @@ public class signup extends JFrame {
 					isValid=false;
 				}
 				else {
-					registerUser(username,password);
+					MessageDigest messageDigest;
+					try {
+						messageDigest = MessageDigest.getInstance("MD5");
+						messageDigest.update(password.getBytes());
+						byte[] resultByteArray = messageDigest.digest();
+						StringBuilder sb = new StringBuilder();
+						for(byte b: resultByteArray) {
+							sb.append(String.format("%02x",b));
+						}
+						password=sb.toString();
+						registerUser(username,password);
+					} catch (NoSuchAlgorithmException e1) {e1.printStackTrace();}
 				}
 			}
     		
@@ -140,7 +154,6 @@ public class signup extends JFrame {
     }
     void gotoLogin() {
     	gotoLogin.addMouseListener(new MouseAdapter() {
-
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
 				login login = new login();
@@ -157,7 +170,7 @@ public class signup extends JFrame {
         	String query = "SELECT * FROM users WHERE username='"+username+"'";
         	ResultSet resultSet = statement.executeQuery(query);
     		if(resultSet.next()) {
-    			validErr.setText("Username already exists");
+    			validErr.setText("Username already exists!");
 				isValid=false;
     		}	
     		else {

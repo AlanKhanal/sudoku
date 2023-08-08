@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,6 +30,8 @@ public class login extends JFrame {
     public login() {
         setTitle("SUDOKU");
         setSize(650, 550);
+        Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Users\\ASUS\\eclipse-workspace\\sudoku\\src\\sudoku\\icon\\newgame.png");    
+        setIconImage(icon);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(true);
 
@@ -130,6 +134,7 @@ public class login extends JFrame {
 		}
 		else {
 			
+			
 			return true;
 		}
     }
@@ -151,6 +156,17 @@ public class login extends JFrame {
     	
     }
     public void loginUser(String username,String password) {
+    	MessageDigest messageDigest;
+		try {
+			messageDigest = MessageDigest.getInstance("MD5");
+			messageDigest.update(password.getBytes());
+			byte[] resultByteArray = messageDigest.digest();
+			StringBuilder sb = new StringBuilder();
+			for(byte b: resultByteArray) {
+				sb.append(String.format("%02x",b));
+			}
+			password=sb.toString();
+		} catch (NoSuchAlgorithmException e1) {e1.printStackTrace();}
     	try {
         	Connection connection = connect.getConnection();
         	Statement statement = connection.createStatement();
@@ -163,7 +179,7 @@ public class login extends JFrame {
         		}	
         		else {
 //            				
-        			validErr.setText("Not Found");
+        			validErr.setText("Login Failed. Check username and password.");
         		}
         		
     	}
@@ -180,6 +196,7 @@ public class login extends JFrame {
             }
 
             login loginForm = new login();
+            
             loginForm.setVisible(true);
     }
 }

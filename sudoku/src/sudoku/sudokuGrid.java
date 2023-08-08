@@ -20,47 +20,47 @@ import javax.swing.border.Border;
 
 
 class myFrame extends JFrame implements KeyListener{
+	Boolean status=false;
 	public String gameID="";
 	JLabel timeLabel;
 	Timer timer ;
 	long startTime;
 	long elapsedTime,minutes,seconds,milliseconds;
-	String time;
+	String time, getMinute, getSec, getMillisec;
 	int easyZero=0,easyOnes=0,medZero=0,medOnes=0,hardZero=0,hardOnes=0;
 	int point=0;
 	int totHint=0;
 	int levelSet=0;
+	int highMin=0,highSec=0,highMillisec=0;
 	JButton hint, surrender;
 	String hintDialog="";
 	String level="";
 	void levelSelection() {
-			String[] options = {"Easy", "Medium", "Hard"};
-            int result = JOptionPane.showOptionDialog(this, "Select the difficulty level", "Level Selection",
-            		JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
-            // Handle the selected option
-            if (result >= 0 && result < options.length) {
-                String selectedOption = options[result];
-                System.out.println("Selected Level: " + selectedOption);
-                // Add logic to set the difficulty level based on the selection
-               if(selectedOption=="Easy") {
-            	   levelSet=15;
-            	   level="easy";
-               }
-               if(selectedOption=="Medium") {
-            	   levelSet=35;
-            	   level="medium";
-               }
-               if(selectedOption=="Hard") {
-            	   levelSet=55;
-            	   level="hard";
-               }
-            } 
-
-            else {
-            	closeFrame();
-            }
-		}
-		String gameIdGenerator() {
+		String[] options = {"Easy", "Medium", "Hard"};
+        int result = JOptionPane.showOptionDialog(this, "Select the difficulty level", "Level Selection",
+        		JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+        // Handle the selected option
+        if (result >= 0 && result < options.length) {
+            String selectedOption = options[result];
+            System.out.println("Selected Level: " + selectedOption);
+            // Add logic to set the difficulty level based on the selection
+           if(selectedOption=="Easy") {
+        	   levelSet=15;
+        	   level="easy";
+           }
+           if(selectedOption=="Medium") {
+        	   levelSet=35;
+        	   level="medium";
+           }
+           if(selectedOption=="Hard") {
+        	   levelSet=55;
+        	   level="hard";
+           }
+        }
+        else {closeFrame();}
+	}
+	
+	String gameIdGenerator() {
 		String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		int idLength=10;
 		Random randomId = new Random();
@@ -73,8 +73,6 @@ class myFrame extends JFrame implements KeyListener{
 		return sb.toString();
 	}
 	
-	
-	
 	void closeFrame() {
 		try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -85,7 +83,6 @@ class myFrame extends JFrame implements KeyListener{
 		login.setVisible(true);
 //		dispose();
 	}
-	public buttonCreator buttonCreator;
 	Container c;
 	JPanel east,west,north,south,center;
 	JTextField[][] grids;
@@ -95,18 +92,16 @@ class myFrame extends JFrame implements KeyListener{
 	void east(){
 		east = new JPanel();
 		east.setBackground(Color.LIGHT_GRAY);
-		east.setPreferredSize(new Dimension(450,450));
+		east.setPreferredSize(new Dimension(150,450));
 		c.add(east,BorderLayout.EAST);
 		
-		GridLayout gridLayout = new GridLayout(4, 1); // 3 rows, 1 column
+		GridLayout gridLayout = new GridLayout(4, 1); // 4 rows, 1 column
 	    east.setLayout(gridLayout);
 		
 	    timer();
 		newgame();
 		hint();
 		surrender();
-		//exit();
-		//about();
 	}
 	void timer() {
 		timeLabel = new JLabel("00:00:000");
@@ -115,7 +110,6 @@ class myFrame extends JFrame implements KeyListener{
 		startTime = System.currentTimeMillis();
 		
 		timer = new Timer(10,e->{
-			
 			elapsedTime=System.currentTimeMillis()-startTime;
 			minutes = (elapsedTime/60000)%60;
 			seconds = (elapsedTime/1000)%60;
@@ -138,27 +132,43 @@ class myFrame extends JFrame implements KeyListener{
         timeLabel.setText(time);
 	}
 	void newgame() {
-		JButton newgame = new JButton("New Game");
+		JButton newgame = new JButton();
+		ImageIcon newgameIcon = new ImageIcon("C:\\Users\\ASUS\\eclipse-workspace\\sudoku\\src\\sudoku\\icon\\newgame.png");
+		Image scaledImage = newgameIcon.getImage().getScaledInstance(50,50,Image.SCALE_SMOOTH);
+		newgameIcon = new ImageIcon(scaledImage);
+		newgame.setIcon(newgameIcon);
 		newgame.addActionListener(e ->{
-			JDialog newConfirm = new JDialog(this,"New Game", true);
-			int choice = JOptionPane.showOptionDialog(this, "Start new game? This will be counted as a loss.", "New Game?",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-			if (choice == JOptionPane.YES_OPTION) {
+			if(status==true) {
 				sudokuGrid newGame = new sudokuGrid();
 				newGame.sudokuGrid();
-				dispose();
-				newConfirm.dispose();
-            } else if (choice == JOptionPane.NO_OPTION) {
-                newConfirm.dispose();
-            } else {
-            	newConfirm.dispose();
-            }
+			}
+			else {
+				JDialog newConfirm = new JDialog(this,"New Game", true);
+				int choice = JOptionPane.showOptionDialog(this, "Start new game? This will be counted as a loss.", "New Game?",
+	                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+				if (choice == JOptionPane.YES_OPTION) {
+					sudokuGrid newGame = new sudokuGrid();
+					newGame.sudokuGrid();
+					dispose();
+					newConfirm.dispose();
+	            } else if (choice == JOptionPane.NO_OPTION) {
+	                newConfirm.dispose();
+	            } else {
+	            	newConfirm.dispose();
+	            }	
+			}
+
 		});
 		east.add(newgame);
 		setVisible(true);
 	}
 	void surrender() {
-		surrender = new JButton("Surrender");
+		surrender = new JButton();
+		ImageIcon surrenderIcon = new ImageIcon("C:\\Users\\ASUS\\eclipse-workspace\\sudoku\\src\\sudoku\\icon\\surrender.png");
+		Image scaledImage = surrenderIcon.getImage().getScaledInstance(50,50,Image.SCALE_SMOOTH);
+		surrenderIcon = new ImageIcon(scaledImage);
+		surrender.setIcon(surrenderIcon);
+		
 		surrender.addActionListener(e->{
 			JDialog surrenderConfirm = new JDialog(this, "Surrender",true);
 			int choice = JOptionPane.showOptionDialog(this, "Do you want to surrender? This will be counted as a loss.", "Surrender?",
@@ -183,6 +193,7 @@ class myFrame extends JFrame implements KeyListener{
 				point=0;
 				hint.setEnabled(false);
 				surrender.setEnabled(false);
+//				status=true;
 				unsolved();
             } else if (choice == JOptionPane.NO_OPTION) {
                 surrenderConfirm.dispose();
@@ -197,7 +208,11 @@ class myFrame extends JFrame implements KeyListener{
 	
 	void hint() {
 		totHint=3;
-		hint = new JButton("Hint");
+		hint = new JButton();
+		ImageIcon hintIcon = new ImageIcon("C:\\Users\\ASUS\\eclipse-workspace\\sudoku\\src\\sudoku\\icon\\hint.png");
+		Image scaledImage = hintIcon.getImage().getScaledInstance(50,50,Image.SCALE_SMOOTH);
+		hintIcon = new ImageIcon(scaledImage);
+		hint.setIcon(hintIcon);
 		hintDialog= "You have 3 hints. Get hint?";
 		hint.addActionListener(e->{
 			if(totHint==0) {
@@ -306,7 +321,6 @@ class myFrame extends JFrame implements KeyListener{
 		  //easy=40-45
 		  //medium=46-49
 		  //hard=50-54
-		  //expert=55-60
 		for(int i=0;i<=levelSet;i++) {
 			int randomRow=randomArr.nextInt(9);
 			int randomCol=randomArr.nextInt(9);
@@ -389,7 +403,7 @@ class myFrame extends JFrame implements KeyListener{
 	}
 	//unused event
 	@Override public void keyTyped(KeyEvent e) {} @Override public void keyPressed(KeyEvent e) {}
-	
+
 	void gameRecord() {
 		gameID=gameIdGenerator();
 		System.out.println("gameRecord"+gameID);
@@ -401,13 +415,14 @@ class myFrame extends JFrame implements KeyListener{
 		try {
 			Statement statement = connection.createStatement();
 			String username = fetchSession.getSessionData();
-			String gameStart = "INSERT INTO performance(`game_id`,`username`,`solve`,`level`) VALUES('"+gameID+"','"+username+"',0,'"+level+"')";
+			String gameStart = "INSERT INTO performance(`game_id`,`username`,`solve`,`level`,`minute`,`sec`,`millisec`) VALUES('"+gameID+"','"+username+"',0,'"+level+"',0,0,0)";
 			statement.executeUpdate(gameStart);
 			statement.close();
 		}
 		catch(SQLException e){e.printStackTrace();}
 	}
 	void updateRecord() {
+		status=true;
 		System.out.println("updateRecord"+gameID);
 		Connection connection = null;
 		try {connection = connect.getConnection();}
@@ -415,7 +430,7 @@ class myFrame extends JFrame implements KeyListener{
 		try {
 			Statement statement = connection.createStatement();
 			String username = fetchSession.getSessionData();
-			String gameStart = "UPDATE performance SET `solve` = 1 WHERE `username` = '"+username+"' and `game_id`='"+gameID+"'";
+			String gameStart = "UPDATE performance SET `solve` = 1, minute="+minutes+",sec="+seconds+",millisec="+milliseconds+" WHERE `username` = '"+username+"' and `game_id`='"+gameID+"'";
 			statement.executeUpdate(gameStart);
 			statement.close();
 		}
@@ -431,7 +446,27 @@ class myFrame extends JFrame implements KeyListener{
 			String getEasy = "SELECT SUM(solve=0) AS zeros, SUM(solve=1) AS ones FROM performance WHERE username='"+username+"' and level = 'easy'";
 			String getMedium = "SELECT SUM(solve=0) AS zeros, SUM(solve=1) AS ones FROM performance WHERE username='"+username+"' and level = 'medium'";
 			String getHard = "SELECT SUM(solve=0) AS zeros, SUM(solve=1) AS ones FROM performance WHERE username='"+username+"' and level = 'hard'";
+			getMinute = "SELECT MIN(minute) AS highMinute FROM performance WHERE solve=1 and username='"+username+"'";
 			
+			
+			//highScore
+			ResultSet resultMin = statement.executeQuery(getMinute);
+			if(resultMin.next()) {
+				highMin = resultMin.getInt("highMinute");
+				
+				getSec="SELECT MIN(sec) AS highSec FROM performance WHERE solve=1 and username='"+username+"' and minute="+highMin;
+				ResultSet resultSec = statement.executeQuery(getSec);
+				if(resultSec.next()) {
+					highSec = resultSec.getInt("highSec");
+					
+					getMillisec="SELECT MIN(millisec) AS highMillisec FROM performance WHERE solve=1 and username='"+username+"' and sec="+highSec;
+					ResultSet resultMillisec = statement.executeQuery(getMillisec);
+					if(resultMillisec.next()) {
+						highMillisec = resultMillisec.getInt("highMillisec");
+					}
+				}
+			}
+			//level
 			ResultSet resultEasy = statement.executeQuery(getEasy);
 			if(resultEasy.next()) {
 				easyZero = resultEasy.getInt("zeros");
@@ -484,23 +519,38 @@ class myFrame extends JFrame implements KeyListener{
 				}
 			}
 			resultData();
-			JOptionPane.showMessageDialog(this, "Congratulation! You have completed the puzzle!\n"
-					+"Lost     Wins      Level\n"
-					+easyZero +"            "+ easyOnes +"        Easy\n"
-					+medZero +"            "+medOnes +"        Medium\n"
-					+hardZero +"            "+hardOnes +"        Hard");
+			String highTime =+highMin+":"+highSec+":"+highMillisec;
+			String nowTime=minutes+":"+seconds+":"+milliseconds;
 			
+			System.out.println(highMin+":"+highSec+":"+highMillisec+"\n"
+					+minutes+":"+seconds+":"+milliseconds);
+			String tableFromat = "%-10s %-10s %-10s\n";
+			if(highMin>=minutes) {
+				if(highSec >= seconds) {
+					if(highMillisec >= milliseconds) {
+						nowTime+="\nNew High Score!";
+					}
+				}
+			}
+			
+			String table = String.format(tableFromat, "Level","    Lost","Wins")
+					+String.format(tableFromat, "Easy  ","     "+easyZero,"     "+easyOnes)
+					+String.format(tableFromat, "Medium",medZero,medOnes)
+					+String.format(tableFromat, "Hard  ","     "+hardZero,"     "+hardOnes)
+					+String.format(tableFromat, "\nHigh Score: ", highTime,"")
+					+String.format(tableFromat, "Your Score: " , nowTime,"");
+			JOptionPane.showMessageDialog(null, table, "Congratulation! You solved the puzzle!", JOptionPane.INFORMATION_MESSAGE);
 			setVisible(true);
 		}
 	}
 	void unsolved() {
 		resultData();
-		JOptionPane.showMessageDialog(this, "You Lost!\n"
-				+"Lost     Wins      Level\n"
-				+easyZero +"            "+ easyOnes +"        Easy\n"
-				+medZero +"            "+medOnes +"        Medium\n"
-				+hardZero +"            "+hardOnes +"        Hard");
-		
+		String tableFromat = "%-10s %-10s %-10s\n";
+		String table = String.format(tableFromat, "Level","    Lost","Wins")
+						+String.format(tableFromat, "Easy  ","     "+easyZero,"     "+easyOnes)
+						+String.format(tableFromat, "Medium",medZero,medOnes)
+						+String.format(tableFromat, "Hard  ","     "+hardZero,"     "+hardOnes);
+		JOptionPane.showMessageDialog(null, table, "You Lost!", JOptionPane.INFORMATION_MESSAGE);
 		setVisible(true);
 	}
 }
@@ -515,7 +565,6 @@ class fetchSession{
 	boolean sessionCheck() {
 		String sessionData = fetchSession.getSessionData();
 		if(sessionData==null) {
-			
 			return false;
 		}
 		else {
@@ -539,7 +588,9 @@ public class sudokuGrid {
 		f.levelSelection();
     	f.addKeyListener(new myFrame());
         f.setTitle("Sudoku | " + username);
-        f.setSize(850, 450);
+        f.setSize(600, 450);
+        Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Users\\ASUS\\eclipse-workspace\\sudoku\\src\\sudoku\\icon\\newgame.png");    
+        f.setIconImage(icon);
         f.setLocationRelativeTo(null);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -555,7 +606,8 @@ public class sudokuGrid {
         	public void windowClosing(WindowEvent e) {
         		int option = JOptionPane.showConfirmDialog(f,"Exit game?");
             	if(option == JOptionPane.YES_OPTION) {
-            		System.exit(0);
+//            		System.exit(0);
+            		f.dispose();
             	}
             	else if(option==JOptionPane.NO_OPTION) {
             		f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -570,9 +622,7 @@ public class sudokuGrid {
     public static void main(String[] args){
     	try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			
-		}
+		} catch (Exception e) {}
     	sudokuGrid();
     }
 }
