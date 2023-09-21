@@ -14,7 +14,7 @@ The remaining grids will have uneditable numbers for puzzle solving purpose.
 
 The ediatable grids have validation i.e only single digit number is able to enter else the grid is emptied.
 
-_Features done:_
+_Features:_
 
   a. New Game
   
