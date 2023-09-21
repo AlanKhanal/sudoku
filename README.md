@@ -22,7 +22,7 @@ _Features:_
   
   c. Surrender (Displays solved sudoku puzzle)
   
-  d. Stop-watch
+  d. Timer
   
   e. Level Selection (After Login and Before Game Initiation)
   
