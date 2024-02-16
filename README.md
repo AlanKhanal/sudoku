@@ -36,7 +36,7 @@ _Features:_
 
   j. Win and Loss status after each game is finished.
 
-**The code is not properly managed.** 
+**Files and thier Funntionality** 
 
   login.java -> Has login code.
   
